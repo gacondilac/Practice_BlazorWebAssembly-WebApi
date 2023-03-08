@@ -14,20 +14,21 @@ namespace ShopOnline.Api.Repositories
         {
             _shopOnlineDbContext = shopOnlineDbContext;
         }
-        public async Task<IEnumerable<ProductCategory>> GetCategories()
+        public async Task<ProductDto> GetItem(int id)
         {
-            var categories = await _shopOnlineDbContext.ProductCategories.ToListAsync();
-            return categories;
-        }
+            var product = await _shopOnlineDbContext.Products.Include(_ => _.ProductCategory).Where(x => x.Id == id).Select(x => new ProductDto
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Description = x.Description,
+                ImageURL = x.ImageURL,
+                Price = x.Price,
+                Qty = x.Qty,
+                CategoryId = x.ProductCategory.Id,
+                CategoryName = x.ProductCategory.Name,
+            }).FirstOrDefaultAsync();
 
-        public Task<ProductCategory> GetCategory(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Product> GetItem(int id)
-        {
-            throw new NotImplementedException();
+            return product;
         }
 
         public async Task<IEnumerable<ProductDto>> GetItems()
